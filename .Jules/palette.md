@@ -1,0 +1,3 @@
+## 2024-05-04 - Authentication Forms Loading State Feedback
+**Learning:** Adding immediate visual feedback (like a loading spinner and changing button text to "Bekleniyor..." or "Kayıt olunuyor...") on authentication forms significantly improves user experience and accessibility by reassuring the user that their request is being processed. This also prevents confusion and frustration caused by seemingly unresponsive interfaces and discourages multiple form submissions.
+**Action:** Always implement visible loading states on primary asynchronous action buttons (like login, register, submit) to ensure users know their action was registered.
