@@ -1,5 +1,13 @@
 # USER_FLOWS.md
 
+## Güncel Akış Kararları
+
+- Google ile giriş bu sürümde kapalıdır; kullanıcılar e-posta/şifre ile kayıt olur ve giriş yapar.
+- Doğum yılı kayıt ve profil ekranlarında tam 4 hanelidir.
+- Admin girişten sonra `/admin`, scanner girişten sonra `/scanner`, normal kullanıcı girişten sonra `/dashboard` sayfasına gider.
+- Girişsiz protected linke tıklayan kullanıcı `/login?next=...` sayfasına alınır ve girişten sonra hedef sayfaya döner.
+- Admin menüsü yalnız admin işleri, scanner menüsü yalnız scanner işi gösterir.
+
 ## 1. Normal Kullanıcı Kayıt Akışı
 
 1. Kullanıcı siteye girer.
@@ -28,17 +36,10 @@ Hata durumları:
 - Doğum yılı geçersiz
 - E-posta doğrulanmamış
 
-## 2. Google ile Giriş Akışı
+## 2. Google ile Giriş Akışı (Kapalı)
 
-1. Kullanıcı “Google ile Giriş Yap” butonuna basar.
-2. Google OAuth ekranı açılır.
-3. Kullanıcı hesabını seçer.
-4. Supabase callback ile kullanıcıyı doğrular.
-5. Eğer profil yoksa otomatik profil oluşturulur.
-6. Eksik alan varsa kullanıcı profil tamamlama ekranına gönderilir.
-7. Dashboard açılır.
-
-Google hesabından isim/e-posta alınabilir, ancak doğum yılı alınamayacağı için ilk girişte doğum yılı istenmelidir.
+Bu sürümde Google ile giriş kapalıdır. Kullanıcı e-posta/şifre ile giriş yapar.
+Google tekrar açılırsa ayrı bir OAuth kurulum fazında profil tamamlama akışıyla birlikte ele alınacaktır.
 
 ## 3. Kullanıcının Parti Görme Akışı
 

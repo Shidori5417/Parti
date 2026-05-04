@@ -1,5 +1,13 @@
 # AGENTS.md
 
+## Güncel Uygulama Kararları
+
+- Google OAuth bu sürümde kapalıdır; auth akışı e-posta/şifre ile yürür.
+- Login sonrası kullanıcı rolüne göre yönlendirilir: `admin -> /admin`, `scanner -> /scanner`, `user -> /dashboard`.
+- Admin ve scanner hesaplarında yalnız role gerekli menü linkleri gösterilir.
+- Doğum yılı tüm kullanıcı formlarında zorunlu, tam 4 haneli ve `1900..geçerli yıl` aralığında olmalıdır.
+- Protected sayfalara girişsiz gidildiğinde `/login?next=...` kullanılır ve başarılı girişten sonra hedefe dönülür.
+
 Bu dosya, projede AI agent/ekip görevlerini düzenlemek için hazırlanmıştır.
 
 ## Genel Proje Kuralı
@@ -135,7 +143,7 @@ Görevleri:
 Test senaryoları:
 
 - E-posta ile kayıt
-- Google ile giriş
+- Google OAuth kapalı kararının dokümanda ve UI'da korunması
 - Admin parti oluşturma
 - Kullanıcıya bilet tanımlama
 - Kullanıcı bilet PDF indirme

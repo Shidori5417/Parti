@@ -29,6 +29,14 @@ export async function GET(
 ) {
   const { ticketId } = await params;
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ ok: false, message: "Oturum açmanız gerekiyor." }, { status: 401 });
+  }
+
   const { data } = await supabase
     .from("tickets")
     .select("id,holder_first_name,holder_last_name,max_entries,used_entries,status,qr_token,parties(title,starts_at,location_name,address,important_notes)")

@@ -2,11 +2,17 @@ import { z } from "zod";
 
 const currentYear = new Date().getFullYear();
 
-const birthYearRequired = z.coerce
-  .number()
-  .int()
-  .min(1900, "Doğum yılı geçersiz.")
-  .max(currentYear, "Doğum yılı gelecekte olamaz.");
+const birthYearRequired = z
+  .string()
+  .regex(/^\d{4}$/, "Doğum yılı 4 haneli olmalı.")
+  .transform((value) => Number(value))
+  .pipe(
+    z
+      .number()
+      .int()
+      .min(1900, "Doğum yılı geçersiz.")
+      .max(currentYear, "Doğum yılı gelecekte olamaz."),
+  );
 
 export const loginSchema = z.object({
   email: z.email("Geçerli bir e-posta girin."),

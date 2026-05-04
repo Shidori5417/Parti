@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { UserPlus, Loader2 } from "lucide-react";
+import { Loader2, UserPlus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
+import { registerSchema } from "@/lib/validators/auth";
 
 export default function RegisterPage() {
   const [message, setMessage] = useState<string | null>(null);
@@ -17,23 +18,31 @@ export default function RegisterPage() {
     setMessage(null);
 
     const formData = new FormData(event.currentTarget);
-    const firstName = String(formData.get("firstName") ?? "");
-    const lastName = String(formData.get("lastName") ?? "");
-    const birthYear = String(formData.get("birthYear") ?? "");
-    const email = String(formData.get("email") ?? "");
-    const password = String(formData.get("password") ?? "");
+    const parsed = registerSchema.safeParse({
+      firstName: String(formData.get("firstName") ?? ""),
+      lastName: String(formData.get("lastName") ?? ""),
+      birthYear: String(formData.get("birthYear") ?? ""),
+      email: String(formData.get("email") ?? ""),
+      password: String(formData.get("password") ?? ""),
+    });
+
+    if (!parsed.success) {
+      setMessage(parsed.error.issues[0]?.message ?? "Form geçersiz.");
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const supabase = createClient();
       const { error } = await supabase.auth.signUp({
-        email,
-        password,
+        email: parsed.data.email,
+        password: parsed.data.password,
         options: {
           emailRedirectTo: `${window.location.origin}/auth/callback`,
           data: {
-            first_name: firstName,
-            last_name: lastName,
-            birth_year: birthYear,
+            first_name: parsed.data.firstName,
+            last_name: parsed.data.lastName,
+            birth_year: String(parsed.data.birthYear),
           },
         },
       });
@@ -54,7 +63,7 @@ export default function RegisterPage() {
         <form className="mt-6 grid gap-4 md:grid-cols-2" onSubmit={register}>
           <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="firstName" placeholder="İsim" required />
           <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="lastName" placeholder="Soyisim" required />
-          <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="birthYear" placeholder="Doğum yılı" type="number" required />
+          <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="birthYear" placeholder="Doğum yılı" type="text" inputMode="numeric" pattern="[0-9]{4}" minLength={4} maxLength={4} required />
           <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="email" placeholder="E-posta" type="email" required />
           <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400 md:col-span-2" name="password" placeholder="Şifre" type="password" minLength={6} required />
           {message && <p className="rounded-md bg-white/10 p-3 text-sm text-zinc-200 md:col-span-2">{message}</p>}

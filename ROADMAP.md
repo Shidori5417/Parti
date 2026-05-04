@@ -1,5 +1,12 @@
 # ROADMAP.md
 
+## Güncel Durum Notu
+
+- Google OAuth bu fazda kapalıdır ve gelecek özellik olarak değerlendirilecektir.
+- Rol bazlı ana ekran ve menü ayrımı production davranışıdır.
+- Doğum yılı validasyonu frontend, Zod ve database constraint katmanlarında 4 hane olarak uygulanır.
+- Auth/session yönlendirmesi `next` parametresiyle protected sayfalara geri dönüşü destekler.
+
 ## Faz 0 — Proje Kurulumu
 
 Hedef: Temel iskeleti kurmak.
@@ -31,7 +38,7 @@ Yapılacaklar:
 - Supabase Auth ayarla
 - Email/password kayıt
 - Email confirmation
-- Google OAuth
+- Google OAuth kapalı kararını koru; ileride gerekirse ayrı fazda aç.
 - Auth callback route
 - `profiles` tablosu
 - Kayıt sonrası profil oluşturma

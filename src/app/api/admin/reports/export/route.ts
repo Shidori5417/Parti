@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { requireRole } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -50,11 +49,26 @@ function csvResponse(filename: string, csv: string) {
 }
 
 export async function GET(request: NextRequest) {
-  await requireRole(["admin"]);
-
   const type = (request.nextUrl.searchParams.get("type") ?? "tickets") as ExportType;
   const partyId = request.nextUrl.searchParams.get("partyId");
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json({ error: "Oturum açmanız gerekiyor." }, { status: 401 });
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (profile?.role !== "admin") {
+    return NextResponse.json({ error: "Bu işlem için yetkiniz yok." }, { status: 403 });
+  }
 
   if (type === "scans") {
     let query = supabase

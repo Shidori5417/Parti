@@ -1,5 +1,12 @@
 # MVP.md
 
+## Güncel MVP Kararları
+
+- Google ile giriş MVP aktif kapsamından çıkarıldı; bu sürümde e-posta/şifre akışı kullanılır.
+- Admin ve scanner kullanıcıları normal kullanıcı bilet menülerini görmez; role özel panellere yönlenir.
+- Doğum yılı kayıt ve profil tamamlama sırasında tam 4 haneli ve geçerli yıl aralığında zorunludur.
+- Oturum çerezi korunur; protected linke girişsiz gidilirse login sonrası aynı hedefe dönülür.
+
 ## MVP Hedefi
 
 İlk sürümün amacı, partiyi gerçek hayatta yönetebilecek kadar çalışan, güvenli ve kullanılabilir bir sistem çıkarmaktır.
@@ -8,7 +15,7 @@ MVP sonunda şunlar yapılabiliyor olmalı:
 
 1. Kullanıcı kayıt/giriş yapabilmeli.
 2. E-posta doğrulaması çalışmalı.
-3. Google ile giriş çalışmalı.
+3. Google OAuth bu sürümde kapalı kalmalı.
 4. Admin parti oluşturabilmeli.
 5. Kullanıcı yayındaki partileri görebilmeli.
 6. Admin kullanıcıya bilet tanımlayabilmeli.
@@ -26,7 +33,7 @@ MVP sonunda şunlar yapılabiliyor olmalı:
 
 - E-posta/şifre kayıt
 - E-posta doğrulama
-- Google ile giriş
+- Google OAuth kapalı; ileride tekrar açılabilir.
 - Çıkış yapma
 - Protected routes
 - Role-based redirect
@@ -112,7 +119,7 @@ MVP'de basit raporlar yeterli:
 
 - Kullanıcı kayıt olduğunda `profiles` tablosunda profil oluşmalı.
 - E-posta doğrulaması yapılmadan kritik işlemler kısıtlanmalı.
-- Google ile giriş yapan kullanıcı için de profil oluşturulmalı.
+- Google OAuth tekrar açılırsa kullanıcı için profil oluşturulmalı ve eksik doğum yılı profil ekranında istenmeli.
 
 ### Parti
 

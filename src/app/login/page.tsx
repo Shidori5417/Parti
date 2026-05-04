@@ -3,10 +3,20 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CircleUserRound, LogIn, Loader2 } from "lucide-react";
+import { LogIn, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { getRoleHomePath } from "@/lib/auth/roles";
 import { createClient } from "@/lib/supabase/client";
+import type { Profile } from "@/lib/types";
+
+function getSafeNextPath(value: string | null) {
+  if (!value || !value.startsWith("/") || value.startsWith("//")) {
+    return null;
+  }
+
+  return value;
+}
 
 export default function LoginPage() {
   const router = useRouter();
@@ -29,7 +39,19 @@ export default function LoginPage() {
         return;
       }
 
-      router.push("/dashboard");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      const { data: profile } = user
+        ? await supabase
+            .from("profiles")
+            .select("id, first_name, last_name, birth_year, email, role")
+            .eq("id", user.id)
+            .maybeSingle()
+        : { data: null };
+      const nextPath = getSafeNextPath(new URLSearchParams(window.location.search).get("next"));
+
+      router.push(nextPath ?? getRoleHomePath(profile as Profile | null));
       router.refresh();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "Giriş yapılamadı.");
@@ -38,29 +60,11 @@ export default function LoginPage() {
     }
   }
 
-  async function signInWithGoogle() {
-    setIsLoading(true);
-    setMessage(null);
-
-    try {
-      const supabase = createClient();
-      await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
-      });
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : "Google girişi başlatılamadı.");
-      setIsLoading(false);
-    }
-  }
-
   return (
     <main className="grid min-h-screen place-items-center bg-[#09090f] px-4 py-10 text-zinc-100">
       <Card className="w-full max-w-md">
         <h1 className="text-2xl font-bold text-white">Giriş Yap</h1>
-        <p className="mt-2 text-sm text-zinc-400">Biletlerini görmek veya kapıda okutma yapmak için hesabına gir.</p>
+        <p className="mt-2 text-sm text-zinc-400">Hesabına girince rolüne uygun panele yönlendirilirsin.</p>
         <form className="mt-6 space-y-4" onSubmit={signInWithEmail}>
           <label className="block text-sm font-medium text-zinc-300">
             E-posta
@@ -88,10 +92,6 @@ export default function LoginPage() {
             {isLoading ? "Bekleniyor..." : "Giriş Yap"}
           </Button>
         </form>
-        <Button className="mt-3 w-full" variant="secondary" onClick={signInWithGoogle} disabled={isLoading}>
-          {isLoading ? <Loader2 className="animate-spin" size={18} /> : <CircleUserRound size={18} />}
-          {isLoading ? "Bekleniyor..." : "Google ile Giriş"}
-        </Button>
         <p className="mt-5 text-center text-sm text-zinc-400">
           Hesabın yok mu?{" "}
           <Link className="font-semibold text-fuchsia-300" href="/register">

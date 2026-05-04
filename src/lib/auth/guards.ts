@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
+import { getRoleHomePath } from "./roles";
 import type { Profile, UserRole } from "@/lib/types";
+
+export { getRoleHomePath };
 
 export async function getCurrentProfile(): Promise<Profile | null> {
   if (!hasSupabaseEnv()) {
@@ -54,7 +57,7 @@ export async function requireRole(roles: UserRole[]) {
   const profile = await requireProfile();
 
   if (!roles.includes(profile.role)) {
-    redirect("/dashboard");
+    redirect(getRoleHomePath(profile));
   }
 
   return profile;
