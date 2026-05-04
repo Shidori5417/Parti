@@ -7,15 +7,27 @@ const RATE_LIMIT_WINDOW_MS = 60_000;
 const RATE_LIMIT_MAX = 30;
 
 function getClientKey(request: NextRequest) {
+  // Use request.ip if available (provided securely by hosting provider)
+  // Fallback to headers, but be aware they can be spoofed.
   return (
+    // @ts-expect-error NextRequest ip property is not typed in all Next.js versions
+    request.ip ||
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     request.headers.get("x-real-ip") ||
     "local"
   );
 }
 
+const MAX_MAP_SIZE = 10000;
+
 function isRateLimited(key: string) {
   const now = Date.now();
+
+  // Prevent OOM by clearing map if it gets too large
+  if (scanAttempts.size > MAX_MAP_SIZE) {
+    scanAttempts.clear();
+  }
+
   const current = scanAttempts.get(key);
 
   if (!current || current.resetAt <= now) {
@@ -86,7 +98,12 @@ export async function POST(request: NextRequest) {
   });
 
   if (error) {
-    return NextResponse.json({ ok: false, reason: "scan_failed", message: error.message }, { status: 500 });
+    // Log the error internally but don't expose database details to the client
+    console.error("Database scan_ticket error:", error);
+    return NextResponse.json(
+      { ok: false, reason: "scan_failed", message: "Tarama işlemi sırasında bir hata oluştu." },
+      { status: 500 }
+    );
   }
 
   return NextResponse.json(data);
