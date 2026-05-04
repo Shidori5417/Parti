@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { CircleUserRound, LogIn } from "lucide-react";
+import { CircleUserRound, LogIn, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -84,11 +84,13 @@ export default function LoginPage() {
           </label>
           {message && <p className="rounded-md bg-red-500/10 p-3 text-sm text-red-200">{message}</p>}
           <Button className="w-full" type="submit" disabled={isLoading}>
-            <LogIn size={18} /> Giriş Yap
+            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <LogIn size={18} />}
+            {isLoading ? "Bekleniyor..." : "Giriş Yap"}
           </Button>
         </form>
         <Button className="mt-3 w-full" variant="secondary" onClick={signInWithGoogle} disabled={isLoading}>
-          <CircleUserRound size={18} /> Google ile Giriş
+          {isLoading ? <Loader2 className="animate-spin" size={18} /> : <CircleUserRound size={18} />}
+          {isLoading ? "Bekleniyor..." : "Google ile Giriş"}
         </Button>
         <p className="mt-5 text-center text-sm text-zinc-400">
           Hesabın yok mu?{" "}

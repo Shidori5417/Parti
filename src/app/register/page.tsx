@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { UserPlus } from "lucide-react";
+import { UserPlus, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { createClient } from "@/lib/supabase/client";
@@ -59,7 +59,8 @@ export default function RegisterPage() {
           <input className="h-11 rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400 md:col-span-2" name="password" placeholder="Şifre" type="password" minLength={6} required />
           {message && <p className="rounded-md bg-white/10 p-3 text-sm text-zinc-200 md:col-span-2">{message}</p>}
           <Button className="md:col-span-2" type="submit" disabled={isLoading}>
-            <UserPlus size={18} /> Kayıt Ol
+            {isLoading ? <Loader2 className="animate-spin" size={18} /> : <UserPlus size={18} />}
+            {isLoading ? "Kayıt olunuyor..." : "Kayıt Ol"}
           </Button>
         </form>
         <p className="mt-5 text-center text-sm text-zinc-400">
