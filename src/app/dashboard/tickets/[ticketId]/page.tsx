@@ -1,11 +1,10 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { QrCode } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { SiteShell } from "@/components/layout/site-shell";
 import { requireProfile } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
-import { toQrPayload } from "@/lib/qr/generate";
+import { toQrPayload, toQrDataUrl } from "@/lib/qr/generate";
 
 type TicketDetail = {
   id: string;
@@ -43,6 +42,7 @@ export default async function TicketDetailPage({
   }
 
   const remaining = ticket.max_entries - ticket.used_entries;
+  const qrDataUrl = await toQrDataUrl(ticket.qr_token);
 
   return (
     <SiteShell profile={profile}>
@@ -56,7 +56,8 @@ export default async function TicketDetailPage({
             <span className="rounded-md bg-white/10 px-3 py-1 text-sm">{ticket.status}</span>
           </div>
           <div className="mt-8 grid place-items-center rounded-lg border border-white/10 bg-white p-8 text-zinc-950">
-            <QrCode size={180} strokeWidth={1.3} />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qrDataUrl} alt="Bilet QR Kodu" width={256} height={256} className="rounded" />
             <p className="mt-4 max-w-full break-all font-mono text-xs">{toQrPayload(ticket.qr_token)}</p>
           </div>
           <div className="mt-6 grid gap-3 text-sm text-zinc-300 md:grid-cols-3">

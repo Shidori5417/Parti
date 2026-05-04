@@ -29,7 +29,7 @@ export async function updateProfileAction(formData: FormData) {
     .update({
       first_name: parsed.data.firstName,
       last_name: parsed.data.lastName,
-      birth_year: parsed.data.birthYear,
+      birth_year: parsed.data.birthYear ?? null,
     })
     .eq("id", profile.id);
 

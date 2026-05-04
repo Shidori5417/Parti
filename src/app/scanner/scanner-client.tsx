@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { BrowserQRCodeReader, type IScannerControls } from "@zxing/browser";
 import { Camera, ScanLine, Square } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -30,11 +30,21 @@ export function ScannerClient({
   const [cameraState, setCameraState] = useState<"idle" | "starting" | "running" | "error">("idle");
   const [cameraMessage, setCameraMessage] = useState<string | null>(null);
 
+  /** Release all media stream tracks from the video element */
+  const releaseMediaTracks = useCallback(() => {
+    const video = videoRef.current;
+    if (video?.srcObject && video.srcObject instanceof MediaStream) {
+      video.srcObject.getTracks().forEach((track) => track.stop());
+      video.srcObject = null;
+    }
+  }, []);
+
   useEffect(() => {
     return () => {
       controlsRef.current?.stop();
+      releaseMediaTracks();
     };
-  }, []);
+  }, [releaseMediaTracks]);
 
   async function startCamera() {
     if (!videoRef.current || cameraState === "running") {
@@ -57,6 +67,7 @@ export function ScannerClient({
         setCameraMessage("QR okundu. Girişi onaylayabilirsin.");
         controlsRef.current?.stop();
         controlsRef.current = null;
+        releaseMediaTracks();
         setCameraState("idle");
 
         if (typeof navigator !== "undefined" && "vibrate" in navigator) {
@@ -73,6 +84,7 @@ export function ScannerClient({
   function stopCamera() {
     controlsRef.current?.stop();
     controlsRef.current = null;
+    releaseMediaTracks();
     setCameraState("idle");
   }
 
@@ -99,14 +111,19 @@ export function ScannerClient({
       <h1 className="text-3xl font-bold text-white">QR Okut</h1>
       <p className="mt-2 text-zinc-400">Kapıda kullanım için büyük, hızlı ve manuel token destekli başlangıç ekranı.</p>
       <Card className="mt-6">
-        <div className="overflow-hidden rounded-lg border border-white/15 bg-black">
+        <div className="relative overflow-hidden rounded-lg border border-white/15 bg-black">
           <video ref={videoRef} className="aspect-[4/3] w-full object-cover" muted playsInline />
           {cameraState !== "running" && (
-            <div className="grid min-h-40 place-items-center border-t border-white/10 bg-black/50 text-zinc-400">
+            <div className="absolute inset-0 grid place-items-center bg-black/50 text-zinc-400">
               <div className="text-center">
                 <ScanLine className="mx-auto mb-3" size={46} />
                 Kamera hazır.
               </div>
+            </div>
+          )}
+          {cameraState === "running" && (
+            <div className="pointer-events-none absolute inset-0 grid place-items-center">
+              <div className="h-48 w-48 rounded-xl border-2 border-fuchsia-400/60" />
             </div>
           )}
         </div>

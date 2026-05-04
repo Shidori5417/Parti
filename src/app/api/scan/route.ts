@@ -28,6 +28,33 @@ function isRateLimited(key: string) {
 }
 
 export async function POST(request: NextRequest) {
+  /* ── Auth kontrolü ─────────────────────────────────────── */
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return NextResponse.json(
+      { ok: false, reason: "unauthenticated", message: "Oturum açmanız gerekiyor." },
+      { status: 401 },
+    );
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("role")
+    .eq("id", user.id)
+    .maybeSingle();
+
+  if (!profile || !["scanner", "admin"].includes(profile.role)) {
+    return NextResponse.json(
+      { ok: false, reason: "forbidden", message: "Bu işlem için yetkiniz yok." },
+      { status: 403 },
+    );
+  }
+
+  /* ── Rate-limit ─────────────────────────────────────────── */
   const clientKey = getClientKey(request);
 
   if (isRateLimited(clientKey)) {
@@ -37,6 +64,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  /* ── Payload validasyonu ────────────────────────────────── */
   const json = await request.json();
   const parsed = scanTicketSchema.safeParse({
     ...json,
@@ -50,7 +78,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
+  /* ── Bilet tarama ───────────────────────────────────────── */
   const { data, error } = await supabase.rpc("scan_ticket", {
     p_qr_token: parsed.data.token,
     p_party_id: parsed.data.partyId,
@@ -63,3 +91,4 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json(data);
 }
+
