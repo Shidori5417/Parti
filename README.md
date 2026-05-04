@@ -1,36 +1,66 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Parti Liste / Bilet QR Sistemi — Proje Dokümantasyonu
 
-## Getting Started
+Bu klasör, gerçek hayattaki bir parti/etkinlik için kullanıcı listesi, bilet tanımlama, QR bilet indirme ve girişte QR okutma sisteminin proje dokümantasyonunu içerir.
 
-First, run the development server:
+## Dosyalar
+
+- `AGENTS.md` — Projede çalışacak AI/insan agent rolleri ve görev sınırları
+- `DESIGN.md` — Ürün tasarımı, sayfalar, roller, güvenlik kararları ve UI yapısı
+- `MEMORIES.md` — Proje kararları, değişmeyen kabuller ve geliştirme notları
+- `MVP.md` — İlk yayınlanabilir sürüm kapsamı
+- `ROADMAP.md` — Geliştirme aşamaları ve gelecek özellikler
+- `SCHEMA.md` — Supabase/PostgreSQL veri modeli, RLS ve örnek SQL
+- `TECHSTACK.md` — Önerilen teknoloji yığını
+- `USER_FLOWS.md` — Kullanıcı, admin ve okuyucu/scanner akışları
+
+## Proje Özeti
+
+Site, gerçek hayatta yapılacak partiler için dijital liste ve bilet sistemi olarak çalışır.
+
+Temel fikir:
+
+1. Kullanıcı siteye Google ile veya e-posta/şifre ile kayıt olur.
+2. E-posta ile kayıt olan kullanıcının mail adresi doğrulanır.
+3. Admin panelinden parti oluşturulur.
+4. Parti normal kullanıcıların anasayfasında görünür.
+5. Admin, gerçek hayatta ödeme yapan veya davet edilen kişilere bilet tanımlar.
+6. Kullanıcı biletini hesabından görüntüler ve PDF/QR olarak indirir.
+7. Okuyucu hesabı, kapıda QR kodu okutur.
+8. Her bilet yalnızca tanımlı kişi sayısı kadar giriş hakkı verir.
+9. QR okutulunca giriş hakkı düşer ve tekrar kullanım engellenir.
+
+## Sabit Teknoloji Kararları
+
+- Yayınlama: Vercel
+- Veritabanı/Auth/Storage: Supabase
+- Önerilen frontend/backend framework: Next.js App Router + TypeScript
+
+## Geliştirme Başlangıcı
+
+Bu klasör artık Next.js App Router + TypeScript uygulama iskeletini de içerir.
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Yerel adres:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```txt
+http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Supabase bağlantısı için `.env.example` dosyasını temel alarak `.env.local` oluştur:
 
-## Learn More
+```env
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
-To learn more about Next.js, take a look at the following resources:
+İlk database kurulumu için başlangıç migration dosyası:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```txt
+supabase/migrations/0001_initial_schema.sql
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Not: `SUPABASE_SERVICE_ROLE_KEY` sadece server ortamında tutulmalı, client tarafında kullanılmamalıdır.
