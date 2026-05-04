@@ -8,11 +8,6 @@ const birthYearRequired = z.coerce
   .min(1900, "Doğum yılı geçersiz.")
   .max(currentYear, "Doğum yılı gelecekte olamaz.");
 
-const birthYearOptional = z.preprocess(
-  (val) => (val === "" || val === undefined || val === null ? undefined : val),
-  birthYearRequired.optional(),
-);
-
 export const loginSchema = z.object({
   email: z.email("Geçerli bir e-posta girin."),
   password: z.string().min(6, "Şifre en az 6 karakter olmalı."),
@@ -27,7 +22,7 @@ export const registerSchema = loginSchema.extend({
 export const profileSchema = z.object({
   firstName: z.string().min(2, "İsim en az 2 karakter olmalı."),
   lastName: z.string().min(2, "Soyisim en az 2 karakter olmalı."),
-  birthYear: birthYearOptional,
+  birthYear: birthYearRequired,
 });
 
 export type LoginInput = z.infer<typeof loginSchema>;

@@ -36,6 +36,20 @@ export async function requireProfile() {
   return profile;
 }
 
+export function isProfileComplete(profile: Profile) {
+  return Boolean(profile.first_name.trim() && profile.last_name.trim() && profile.birth_year);
+}
+
+export async function requireCompleteUserProfile() {
+  const profile = await requireProfile();
+
+  if (profile.role === "user" && !isProfileComplete(profile)) {
+    redirect("/profile?complete=1");
+  }
+
+  return profile;
+}
+
 export async function requireRole(roles: UserRole[]) {
   const profile = await requireProfile();
 

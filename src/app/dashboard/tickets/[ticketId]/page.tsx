@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Card } from "@/components/ui/card";
 import { SiteShell } from "@/components/layout/site-shell";
-import { requireProfile } from "@/lib/auth/guards";
+import { requireCompleteUserProfile } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
 import { toQrPayload, toQrDataUrl } from "@/lib/qr/generate";
 
@@ -27,7 +27,7 @@ export default async function TicketDetailPage({
 }: {
   params: Promise<{ ticketId: string }>;
 }) {
-  const profile = await requireProfile();
+  const profile = await requireCompleteUserProfile();
   const { ticketId } = await params;
   const supabase = await createClient();
   const { data } = await supabase

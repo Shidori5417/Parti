@@ -42,7 +42,7 @@ export default async function EditPartyPage({
         <h1 className="text-3xl font-bold text-white">Partiyi Düzenle</h1>
         <Card className="mt-6">
           {query.error && <p className="mb-5 rounded-md bg-red-500/10 p-3 text-sm text-red-200">{query.error}</p>}
-          <form action={updatePartyAction} className="grid gap-4">
+          <form action={updatePartyAction} className="grid gap-4" encType="multipart/form-data">
             <input name="partyId" type="hidden" value={party.id} />
             <div className="grid gap-4 md:grid-cols-2">
               <label className="text-sm font-medium text-zinc-300">Parti adı
@@ -91,6 +91,9 @@ export default async function EditPartyPage({
             </div>
             <label className="text-sm font-medium text-zinc-300">Kapak görsel URL
               <input className="mt-2 h-11 w-full rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="coverImageUrl" type="url" defaultValue={party.cover_image_url ?? ""} />
+            </label>
+            <label className="text-sm font-medium text-zinc-300">Yeni kapak görseli yükle
+              <input className="mt-2 block w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-zinc-200 file:mr-4 file:rounded-md file:border-0 file:bg-fuchsia-500 file:px-4 file:py-2 file:font-semibold file:text-white hover:file:bg-fuchsia-400" name="coverImageFile" type="file" accept="image/jpeg,image/png,image/webp" />
             </label>
             <button className="h-12 rounded-md bg-fuchsia-500 px-4 font-semibold text-white hover:bg-fuchsia-400" type="submit">Kaydet</button>
           </form>

@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string; error?: string }>;
+  searchParams: Promise<{ updated?: string; error?: string; complete?: string }>;
 }) {
   const [profile, params] = await Promise.all([requireProfile(), searchParams]);
 
@@ -20,6 +20,9 @@ export default async function ProfilePage({
         <Card className="mt-6">
           {params.updated && (
             <p className="mb-5 rounded-md bg-teal-500/10 p-3 text-sm text-teal-200">Profil güncellendi.</p>
+          )}
+          {params.complete && (
+            <p className="mb-5 rounded-md bg-fuchsia-500/10 p-3 text-sm text-fuchsia-100">Devam etmek için profil bilgilerini tamamla.</p>
           )}
           {params.error && (
             <p className="mb-5 rounded-md bg-red-500/10 p-3 text-sm text-red-200">{params.error}</p>
@@ -35,7 +38,7 @@ export default async function ProfilePage({
             </label>
             <label className="text-sm font-medium text-zinc-300">
               Doğum yılı
-              <input className="mt-2 h-11 w-full rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="birthYear" type="number" defaultValue={profile.birth_year ?? ""} placeholder="Opsiyonel" />
+              <input className="mt-2 h-11 w-full rounded-md border border-white/10 bg-white/10 px-3 text-white outline-none focus:border-fuchsia-400" name="birthYear" type="number" defaultValue={profile.birth_year ?? ""} required />
             </label>
             <p className="rounded-md bg-white/10 p-3 text-sm text-zinc-300">E-posta: {profile.email}</p>
             <button className="h-12 rounded-md bg-fuchsia-500 px-4 font-semibold text-white hover:bg-fuchsia-400" type="submit">

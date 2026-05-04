@@ -17,6 +17,66 @@ function redirectWithError(path: string, message: string): never {
   redirect(`${path}?error=${encodeURIComponent(message)}`);
 }
 
+function getFile(formData: FormData, key: string) {
+  const value = formData.get(key);
+
+  if (!(value instanceof File) || value.size === 0) {
+    return null;
+  }
+
+  return value;
+}
+
+function safeFileName(fileName: string) {
+  return fileName
+    .toLowerCase()
+    .replace(/[^a-z0-9.-]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80);
+}
+
+async function uploadPartyCoverImage({
+  formData,
+  ownerId,
+  redirectPath,
+}: {
+  formData: FormData;
+  ownerId: string;
+  redirectPath: string;
+}) {
+  const file = getFile(formData, "coverImageFile");
+
+  if (!file) {
+    return getString(formData, "coverImageUrl");
+  }
+
+  const allowedTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+
+  if (!allowedTypes.has(file.type)) {
+    redirectWithError(redirectPath, "Kapak görseli JPG, PNG veya WebP olmalı.");
+  }
+
+  if (file.size > 5 * 1024 * 1024) {
+    redirectWithError(redirectPath, "Kapak görseli en fazla 5 MB olabilir.");
+  }
+
+  const supabase = await createClient();
+  const fileName = safeFileName(file.name) || "cover-image";
+  const path = `${ownerId}/${crypto.randomUUID()}-${fileName}`;
+  const { error } = await supabase.storage.from("party-images").upload(path, file, {
+    cacheControl: "31536000",
+    contentType: file.type,
+    upsert: false,
+  });
+
+  if (error) {
+    redirectWithError(redirectPath, error.message);
+  }
+
+  const { data } = supabase.storage.from("party-images").getPublicUrl(path);
+  return data.publicUrl;
+}
+
 export async function createPartyAction(formData: FormData) {
   const profile = await requireRole(["admin"]);
   const parsed = partySchema.safeParse({
@@ -39,6 +99,11 @@ export async function createPartyAction(formData: FormData) {
   }
 
   const input = parsed.data;
+  const coverImageUrl = await uploadPartyCoverImage({
+    formData,
+    ownerId: profile.id,
+    redirectPath: "/admin/parties/new",
+  });
   const supabase = await createClient();
   const { error } = await supabase.from("parties").insert({
     title: input.title,
@@ -51,7 +116,7 @@ export async function createPartyAction(formData: FormData) {
     ends_at: input.endsAt ? new Date(input.endsAt).toISOString() : null,
     price: typeof input.price === "number" ? input.price : null,
     currency: input.currency,
-    cover_image_url: input.coverImageUrl || null,
+    cover_image_url: coverImageUrl || input.coverImageUrl || null,
     status: input.status,
     created_by: profile.id,
   });
@@ -67,7 +132,7 @@ export async function createPartyAction(formData: FormData) {
 }
 
 export async function updatePartyAction(formData: FormData) {
-  await requireRole(["admin"]);
+  const profile = await requireRole(["admin"]);
   const partyId = getString(formData, "partyId");
   const parsed = partySchema.safeParse({
     title: getString(formData, "title"),
@@ -93,6 +158,11 @@ export async function updatePartyAction(formData: FormData) {
   }
 
   const input = parsed.data;
+  const coverImageUrl = await uploadPartyCoverImage({
+    formData,
+    ownerId: profile.id,
+    redirectPath: `/admin/parties/${partyId}/edit`,
+  });
   const supabase = await createClient();
   const { error } = await supabase
     .from("parties")
@@ -107,7 +177,7 @@ export async function updatePartyAction(formData: FormData) {
       ends_at: input.endsAt ? new Date(input.endsAt).toISOString() : null,
       price: typeof input.price === "number" ? input.price : null,
       currency: input.currency,
-      cover_image_url: input.coverImageUrl || null,
+      cover_image_url: coverImageUrl || input.coverImageUrl || null,
       status: input.status,
     })
     .eq("id", partyId);

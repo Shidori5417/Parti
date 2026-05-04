@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Card, StatCard } from "@/components/ui/card";
 import { SiteShell } from "@/components/layout/site-shell";
-import { requireProfile } from "@/lib/auth/guards";
+import { requireCompleteUserProfile } from "@/lib/auth/guards";
 import { createClient } from "@/lib/supabase/server";
 import type { Ticket } from "@/lib/types";
 
@@ -18,7 +18,7 @@ async function getTickets() {
 }
 
 export default async function DashboardPage() {
-  const profile = await requireProfile();
+  const profile = await requireCompleteUserProfile();
   const tickets = await getTickets();
   const remaining = tickets.reduce((total, ticket) => total + Math.max(ticket.max_entries - ticket.used_entries, 0), 0);
 
