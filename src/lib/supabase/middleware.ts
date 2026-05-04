@@ -1,11 +1,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
-import { getSupabaseAnonKey, getSupabaseUrl } from "./env";
+import { getSupabasePublishableKey, getSupabaseUrl } from "./env";
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({ request });
   const url = getSupabaseUrl();
-  const key = getSupabaseAnonKey();
+  const key = getSupabasePublishableKey();
 
   if (!url || !key) {
     return response;
