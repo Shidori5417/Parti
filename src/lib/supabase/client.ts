@@ -1,11 +1,11 @@
 "use client";
 
 import { createBrowserClient } from "@supabase/ssr";
-import { getSupabasePublishableKey, getSupabaseUrl } from "./env";
+import { getSupabaseAnonKey, getSupabaseUrl } from "./env";
 
 export function createClient() {
   const url = getSupabaseUrl();
-  const key = getSupabasePublishableKey();
+  const key = getSupabaseAnonKey();
 
   if (!url || !key) {
     throw new Error("Supabase environment variables are missing.");
